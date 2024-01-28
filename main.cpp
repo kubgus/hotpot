@@ -18,7 +18,7 @@ void run(std::shared_ptr<std::thread> worker, std::string runner) {
 int main(int argc, char** argv) {
     CLI::App app{"Hot reload anything by @kubgus."};
 
-    std::string runner = "echo No runner command! (use -r tag)";
+    std::string runner = "echo \"No runner command! (use -r tag)\"";
     app.add_option("-r,--run,--runner", runner, "Set command to run on refresh. (ex:\"g++ main.cpp; ./a.out\")");
 
     std::string extensions = "c;cpp;h;hpp";
@@ -31,14 +31,13 @@ int main(int argc, char** argv) {
 
     std::cout << "Hotpot CLI by @kubgus.\n"
               << "Website: https://gustafik.com/\n\n"
-              << "Launching!\n";
+              << "Launching and listening for file changes!\n\n";
 
     std::shared_ptr<std::thread> worker = std::make_shared<std::thread>([runner]() {
         system(runner.c_str());
     });
 
     HotWatch watcher{ directory };
-    std::cout << "Listening for file changes...\n\n";
     watcher.start_loop([worker,runner,extensions](std::string file) {
         for (char* tok = strtok(strdup(extensions.c_str()), ";"); tok != NULL; tok = strtok(NULL, ";"))
             if (file.substr(file.find_last_of(".") + 1) == tok) {
